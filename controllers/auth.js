@@ -2,6 +2,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const gravatar = require('gravatar');
 const { validationResult } = require('express-validator');
+const response = require('../helpers/response.helpers');
 require('dotenv').config();
 const User = require('../models/User');
 
@@ -93,4 +94,35 @@ exports.Login = async (req, res) => {
       console.error(err.message);
       res.status(500).send('Server error');
     }
+  }
+
+  exports.createUser = async (req, res) => {
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(400).json({ errors: errors.array() });
+    }
+
+    const { name, email} = req.body;
+
+    try {
+      // See if user exists
+      if (await User.findOne({ email })) {
+        return res.status(400).json({ errors: [{ msg: 'User already exists' }] });
+      }
+
+      // Register new user
+      const user = new User({
+        name,
+        email,
+        avatar: gravatar.url(email, { s: '200', r: 'pg', d: 'mm' }),
+        // password: await bcrypt.hash(password, await bcrypt.genSalt(10)),
+      });
+
+      await user.save();
+      return response.responseHelper(res, true, 'user created'); 
+
+    } catch (err) {
+        console.error(err.message);
+        return response.responseHelper(res, false, 'server error'); 
+      }  
   }
