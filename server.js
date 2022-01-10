@@ -4,7 +4,8 @@ const app = express()
 var cors = require('cors')
 const PORT = process.env.PORT || 5000;
 require('dotenv').config();
-
+const middleware = require('./middleware');
+app.use(middleware.decodeToken);
 
 app.use(cors());
 
@@ -39,7 +40,23 @@ app.get('/', (req, res) => {
   res.send('Hello World!')
 })
 
+app.get('/api/todos', (req, res) => {
+	return res.json({
+		todos: [
+			{
+				title: 'Task1',
+			},
+			{
+				title: 'Task2',
+			},
+			{
+				title: 'Task3',
+			},
+		],
+	});
+});
+
 
 app.listen(PORT, () => {
-  console.log(`Example app listening at http://localhost:${PORT}`)
+  console.log(`Server on http://localhost:${PORT}`)
 })
