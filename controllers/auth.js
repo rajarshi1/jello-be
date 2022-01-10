@@ -96,6 +96,17 @@ exports.Login = async (req, res) => {
     }
   }
 
+
+  exports.geUser = async(req,res)=>{
+    try {
+      const user = await User.findById(req.user.id).select('-password');
+      res.json(user);
+    } catch (err) {
+      console.error(err.message);
+      res.status(500).send('Server error');
+    }
+  }
+
   exports.createUser = async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {

@@ -1,19 +1,12 @@
 const express = require('express');
 const router = express.Router();
 const { check } = require('express-validator');
+const auth = require('../../middleware/auth');
 const authController = require('../../controllers/auth');
 
 
-// Get authorized user
-// router.get('/', auth, async (req, res) => {
-//   try {
-//     const user = await User.findById(req.user.id).select('-password');
-//     res.json(user);
-//   } catch (err) {
-//     console.error(err.message);
-//     res.status(500).send('Server error');
-//   }
-// });
+//Get authorized user
+router.get('/logged-in-user', auth, authController.geUser);
 
 // Authenticate user & get token
 router.post(
