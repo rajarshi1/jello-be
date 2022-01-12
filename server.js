@@ -4,8 +4,8 @@ const app = express()
 var cors = require('cors')
 const PORT = process.env.PORT || 5000;
 require('dotenv').config();
-const middleware = require('./middleware');
-app.use(middleware.decodeToken);
+// const middleware = require('./middleware');
+// app.use(middleware.decodeToken);
 
 app.use(cors());
 
@@ -33,6 +33,7 @@ app.use(express.json({ extended: false }));
 // Define routes
 app.use('/api/auth', require('./routes/api/auth'));
 // app.use('/api/users', require('./routes/api/users'));
+app.use('/api/board', require('./routes/api/board'));
 
 
 //test route
