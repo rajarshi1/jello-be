@@ -6,7 +6,7 @@ const authController = require('../../controllers/auth');
 
 
 //Get authorized user
-router.get('/logged-in-user', auth, authController.geUser);
+router.get('/logged-in-user', auth, authController.getUser);
 
 // Authenticate user & get token
 router.post(
