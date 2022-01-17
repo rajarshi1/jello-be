@@ -3,10 +3,10 @@ const Board = require('../models/Board');
 module.exports = async function (req, res, next) {
   const board = await Board.findById(req.header('boardId'));
   if (!board) {
+    console.log(board,req.body);
     return res.status(404).json({ msg: 'Board not found' });
   }
-
-  const members = board.members.map((member) => member.user);
+  const members = board.members.map((member) => member.user.toString());
   if (members.includes(req.user.id)) {
     next();
   } else {

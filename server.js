@@ -33,7 +33,10 @@ app.use(express.json({ extended: false }));
 // Define routes
 app.use('/api/auth', require('./routes/api/auth'));
 // app.use('/api/users', require('./routes/api/users'));
-app.use('/api/board', require('./routes/api/board'));
+app.use('/api/boards', require('./routes/api/boards'));
+app.use('/api/lists', require('./routes/api/lists'));
+app.use('/api/cards', require('./routes/api/cards'));
+app.use('/api/checklists', require('./routes/api/checklists'));
 
 
 //test route
