@@ -11,7 +11,7 @@ const List = require('../../models/List');
 // Add a list
 router.post(
   '/',
-  [auth, member, [check('title', 'Title is required').not().isEmpty()]],
+  [member, [check('title', 'Title is required').not().isEmpty()]],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -31,7 +31,7 @@ router.post(
       board.lists.push(list.id);
 
       // Log activity
-      const user = await User.findById(req.user.id);
+      const user = await User.findOne({ 'email': `${req.params.email}` });
       board.activity.unshift({
         text: `${user.name} added '${title}' to this board`,
       });
@@ -46,7 +46,7 @@ router.post(
 );
 
 // Get all of a board's lists
-router.get('/boardLists/:boardId', auth, async (req, res) => {
+router.get('/boardLists/:boardId', async (req, res) => {
   try {
     const board = await Board.findById(req.params.boardId);
     if (!board) {
@@ -66,7 +66,7 @@ router.get('/boardLists/:boardId', auth, async (req, res) => {
 });
 
 // Get a list by id
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const list = await List.findById(req.params.id);
     if (!list) {
@@ -83,7 +83,7 @@ router.get('/:id', auth, async (req, res) => {
 // Edit a list's title
 router.patch(
   '/rename/:id',
-  [auth, member, [check('title', 'Title is required').not().isEmpty()]],
+  [ member, [check('title', 'Title is required').not().isEmpty()]],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -108,7 +108,7 @@ router.patch(
 );
 
 // Archive/Unarchive a list
-router.patch('/archive/:archive/:id', [auth, member], async (req, res) => {
+router.patch('/archive/:archive/:id', [ member], async (req, res) => {
   try {
     const list = await List.findById(req.params.id);
     if (!list) {
@@ -119,7 +119,7 @@ router.patch('/archive/:archive/:id', [auth, member], async (req, res) => {
     await list.save();
 
     // Log activity
-    const user = await User.findById(req.user.id);
+    const user = await User.findOne({ 'email': `${req.params.email}` });
     const board = await Board.findById(req.header('boardId'));
     board.activity.unshift({
       text: list.archived
@@ -136,7 +136,7 @@ router.patch('/archive/:archive/:id', [auth, member], async (req, res) => {
 });
 
 // Move a list
-router.patch('/move/:id', [auth, member], async (req, res) => {
+router.patch('/move/:id', member, async (req, res) => {
   try {
     const toIndex = req.body.toIndex ? req.body.toIndex : 0;
     const boardId = req.header('boardId');

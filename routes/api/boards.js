@@ -13,7 +13,7 @@ const Board = require('../../models/Board');
 // Add a board
 router.post(
   '/',
-  [auth, [check('title', 'Title is required').not().isEmpty()]],
+  [check('title', 'Title is required').not().isEmpty()],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -28,12 +28,14 @@ router.post(
       const board = await newBoard.save();
 
       // Add board to user's boards
-      const user = await User.findById(req.user.id);
+      // const user = await User.findById(req.user.id);
+      const user = await User.findOne({ 'email': `${req.user.email}` });
+      // console.log(user);
       user.boards.unshift(board.id);
       await user.save();
 
       // Add user to board's members as admin
-      board.members.push({ user: user.id, name: user.name });
+      board.members.push({ user: user.id, name: user.name, email: user.email  });
 
       // Log activity
       board.activity.unshift({
@@ -69,7 +71,7 @@ router.get('/', async (req, res) => {
 });
 
 // Get a board by id
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const board = await Board.findById(req.params.id);
     if (!board) {
@@ -84,7 +86,7 @@ router.get('/:id', auth, async (req, res) => {
 });
 
 // Get a board's activity
-router.get('/activity/:boardId', auth, async (req, res) => {
+router.get('/activity/:boardId', async (req, res) => {
   try {
     const board = await Board.findById(req.params.boardId);
     if (!board) {
@@ -101,8 +103,9 @@ router.get('/activity/:boardId', auth, async (req, res) => {
 // Change a board's title
 router.patch(
   '/rename/:id',
-  [auth, member, [check('title', 'Title is required').not().isEmpty()]],
+  [member, [check('title', 'Title is required').not().isEmpty()]],
   async (req, res) => {
+    console.log(req.params);
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -116,7 +119,7 @@ router.patch(
 
       // Log activity
       if (req.body.title !== board.title) {
-        const user = await User.findById(req.user.id);
+        const user = await User.findOne({ 'email': `${req.user.email}` });
         board.activity.unshift({
           text: `${user.name} renamed this board (from '${board.title}')`,
         });
@@ -127,23 +130,25 @@ router.patch(
 
       res.json(board);
     } catch (err) {
-      console.error(err.message);
+      console.error(err,err.message);
       res.status(500).send('Server Error');
     }
   }
 );
 
 // Add a board member
-router.put('/addMember/:userId', [auth, member], async (req, res) => {
+router.put('/addMember/:email', member, async (req, res) => {
   try {
+    
     const board = await Board.findById(req.header('boardId'));
-    const user = await User.findById(req.params.userId);
+    const user = await User.findOne({ 'email': `${req.params.email}` });
+   
     if (!user) {
       return res.status(404).json({ msg: 'User not found' });
     }
 
     // See if already member of board
-    if (board.members.map((member) => member.user).includes(req.params.userId)) {
+    if (board.members.map((member) => member.email).includes(req.params.email)) {
       return res.status(400).json({ msg: 'Already member of board' });
     }
 

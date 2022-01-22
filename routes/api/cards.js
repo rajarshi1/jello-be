@@ -12,7 +12,7 @@ const Card = require('../../models/Card');
 // Add a card
 router.post(
   '/',
-  [auth, member, [check('title', 'Title is required').not().isEmpty()]],
+  [member, [check('title', 'Title is required').not().isEmpty()]],
   async (req, res) => {
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
@@ -33,7 +33,7 @@ router.post(
       await list.save();
 
       // Log activity
-      const user = await User.findById(req.user.id);
+      const user = await User.findOne({ 'email': `${req.params.email}` });
       const board = await Board.findById(boardId);
       board.activity.unshift({
         text: `${user.name} added '${title}' to '${list.title}'`,
@@ -49,7 +49,7 @@ router.post(
 );
 
 // Get all of a list's cards
-router.get('/listCards/:listId', auth, async (req, res) => {
+router.get('/listCards/:listId',  async (req, res) => {
   try {
     const list = await List.findById(req.params.listId);
     if (!list) {
@@ -69,7 +69,7 @@ router.get('/listCards/:listId', auth, async (req, res) => {
 });
 
 // Get a card by id
-router.get('/:id', auth, async (req, res) => {
+router.get('/:id', async (req, res) => {
   try {
     const card = await Card.findById(req.params.id);
     if (!card) {
@@ -84,7 +84,7 @@ router.get('/:id', auth, async (req, res) => {
 });
 
 // Edit a card's title, description, and/or label
-router.patch('/edit/:id', [auth, member], async (req, res) => {
+router.patch('/edit/:id', member, async (req, res) => {
   try {
     const { title, description, label } = req.body;
     if (title === '') {
@@ -113,7 +113,7 @@ router.patch('/edit/:id', [auth, member], async (req, res) => {
 });
 
 // Archive/Unarchive a card
-router.patch('/archive/:archive/:id', [auth, member], async (req, res) => {
+router.patch('/archive/:archive/:id', member, async (req, res) => {
   try {
     const card = await Card.findById(req.params.id);
     if (!card) {
@@ -124,7 +124,7 @@ router.patch('/archive/:archive/:id', [auth, member], async (req, res) => {
     await card.save();
 
     // Log activity
-    const user = await User.findById(req.user.id);
+    const user = await User.findOne({ 'email': `${req.params.email}` });
     const board = await Board.findById(req.header('boardId'));
     board.activity.unshift({
       text: card.archived
@@ -141,7 +141,7 @@ router.patch('/archive/:archive/:id', [auth, member], async (req, res) => {
 });
 
 // Move a card
-router.patch('/move/:id', [auth, member], async (req, res) => {
+router.patch('/move/:id',member, async (req, res) => {
   try {
     const { fromId, toId, toIndex } = req.body;
     const boardId = req.header('boardId');
@@ -172,7 +172,7 @@ router.patch('/move/:id', [auth, member], async (req, res) => {
 
     // Log activity
     if (fromId !== toId) {
-      const user = await User.findById(req.user.id);
+      const user = await User.findOne({ 'email': `${req.params.email}` });
       const board = await Board.findById(boardId);
       const card = await Card.findById(cardId);
       board.activity.unshift({
@@ -189,11 +189,11 @@ router.patch('/move/:id', [auth, member], async (req, res) => {
 });
 
 // Add/Remove a member
-router.put('/addMember/:add/:cardId/:userId', [auth, member], async (req, res) => {
+router.put('/addMember/:add/:cardId/:userId', member, async (req, res) => {
   try {
     const { cardId, userId } = req.params;
     const card = await Card.findById(cardId);
-    const user = await User.findById(userId);
+    const user = await User.findOne({ 'email': `${req.params.email}` });
     if (!card || !user) {
       return res.status(404).json({ msg: 'Card/user not found' });
     }
@@ -227,7 +227,7 @@ router.put('/addMember/:add/:cardId/:userId', [auth, member], async (req, res) =
 });
 
 // Delete a card
-router.delete('/:listId/:id', [auth, member], async (req, res) => {
+router.delete('/:listId/:id', member, async (req, res) => {
   try {
     const card = await Card.findById(req.params.id);
     const list = await List.findById(req.params.listId);
@@ -240,7 +240,7 @@ router.delete('/:listId/:id', [auth, member], async (req, res) => {
     await card.remove();
 
     // Log activity
-    const user = await User.findById(req.user.id);
+    const user = await User.findOne({ 'email': `${req.params.email}` });
     const board = await Board.findById(req.header('boardId'));
     board.activity.unshift({
       text: `${user.name} deleted '${card.title}' from '${list.title}'`,
