@@ -4,12 +4,12 @@ const app = express()
 var cors = require('cors')
 const PORT = process.env.PORT || 5000;
 require('dotenv').config();
-// const middleware = require('./middleware');
-// app.use(middleware.decodeToken);
+const middleware = require('./middleware');
 
 // console.log(process.env.CLIENT_SECRET);
 
 app.use(cors());
+app.use(middleware.decodeToken);
 
 // Connect database
 (async function connectDB() {

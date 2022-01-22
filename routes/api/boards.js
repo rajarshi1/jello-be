@@ -1,9 +1,11 @@
 const express = require('express');
 const router = express.Router();
 const auth = require('../../middleware/auth');
-const Middleware = require('../../middleware/index');
+// const Middleware = require('../../middleware/index');
 const member = require('../../middleware/member');
 const { check, validationResult } = require('express-validator');
+
+
 
 const User = require('../../models/User');
 const Board = require('../../models/Board');
@@ -48,9 +50,11 @@ router.post(
 );
 
 // Get user's boards
-router.get('/', auth, async (req, res) => {
+router.get('/', async (req, res) => {
+  // const user1 = await User.findOne({ 'email': `${req.user.email}` });
+  // console.log(req.user.email, user1 );
   try {
-    const user = await User.findById(req.user.id);
+    const user = await User.findOne({ 'email': `${req.user.email}` });
 
     const boards = [];
     for (const boardId of user.boards) {
@@ -59,7 +63,7 @@ router.get('/', auth, async (req, res) => {
 
     res.json(boards);
   } catch (err) {
-    console.error(err.message);
+    console.error(err.message,err);
     res.status(500).send('Server Error');
   }
 });
