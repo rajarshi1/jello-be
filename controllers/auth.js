@@ -18,6 +18,7 @@ exports.SignUp = async (req, res) => {
     try {
       // See if user exists
       if (await User.findOne({ email })) {
+        return
         return res.status(400).json({ errors: [{ msg: 'User already exists' }] });
       }
 
@@ -32,19 +33,20 @@ exports.SignUp = async (req, res) => {
       await user.save();
 
       // Return jsonwebtoken
-      jwt.sign(
-        {
-          user: {
-            id: user.id,
-          },
-        },
-        process.env.JWT_SECRET,
-        { expiresIn: 360000 },
-        (err, token) => {
-          if (err) throw err;
-          res.json({ token });
-        }
-      );
+      // jwt.sign(
+      //   {
+      //     user: {
+      //       id: user.id,
+      //     },
+      //   },
+      //   process.env.JWT_SECRET,
+      //   { expiresIn: 360000 },
+      //   (err, token) => {
+      //     if (err) throw err;
+      //     res.json({ token });
+      //   }
+      // );
+      return response.responseHelper(res, true, 'user created'); 
     } catch (err) {
       console.error(err.message);
       res.status(500).send('Server error');
