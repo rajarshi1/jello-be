@@ -33,7 +33,7 @@ router.post(
       await list.save();
 
       // Log activity
-      const user = await User.findOne({ 'email': `${req.params.email}` });
+      const user = await User.findOne({ 'email': `${req.user.email}` });
       const board = await Board.findById(boardId);
       board.activity.unshift({
         text: `${user.name} added '${title}' to '${list.title}'`,
@@ -124,7 +124,7 @@ router.patch('/archive/:archive/:id', member, async (req, res) => {
     await card.save();
 
     // Log activity
-    const user = await User.findOne({ 'email': `${req.params.email}` });
+    const user = await User.findOne({ 'email': `${req.user.email}` });
     const board = await Board.findById(req.header('boardId'));
     board.activity.unshift({
       text: card.archived
@@ -172,7 +172,7 @@ router.patch('/move/:id',member, async (req, res) => {
 
     // Log activity
     if (fromId !== toId) {
-      const user = await User.findOne({ 'email': `${req.params.email}` });
+      const user = await User.findOne({ 'email': `${req.user.email}` });
       const board = await Board.findById(boardId);
       const card = await Card.findById(cardId);
       board.activity.unshift({
@@ -193,7 +193,7 @@ router.put('/addMember/:add/:cardId/:userId', member, async (req, res) => {
   try {
     const { cardId, userId } = req.params;
     const card = await Card.findById(cardId);
-    const user = await User.findOne({ 'email': `${req.params.email}` });
+    const user = await User.findOne({ 'email': `${req.user.email}` });
     if (!card || !user) {
       return res.status(404).json({ msg: 'Card/user not found' });
     }
@@ -240,7 +240,7 @@ router.delete('/:listId/:id', member, async (req, res) => {
     await card.remove();
 
     // Log activity
-    const user = await User.findOne({ 'email': `${req.params.email}` });
+    const user = await User.findOne({ 'email': `${req.user.email}` });
     const board = await Board.findById(req.header('boardId'));
     board.activity.unshift({
       text: `${user.name} deleted '${card.title}' from '${list.title}'`,

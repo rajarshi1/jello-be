@@ -57,10 +57,14 @@ router.get('/', async (req, res) => {
   // console.log(req.user.email, user1 );
   try {
     const user = await User.findOne({ 'email': `${req.user.email}` });
-
+    console.log(user, );
     const boards = [];
     for (const boardId of user.boards) {
-      boards.push(await Board.findById(boardId));
+      // boards.push(await Board.findById(boardId));
+      let tempboard = await Board.findById(boardId)
+      if(tempboard){
+        boards.push(tempboard)
+      }
     }
 
     res.json(boards);
@@ -152,17 +156,17 @@ router.put('/addMember/:email', member, async (req, res) => {
       return res.status(400).json({ msg: 'Already member of board' });
     }
 
-    // Add board to user's boards
     user.boards.unshift(board.id);
     await user.save();
-
+   
     // Add user to board's members with 'normal' role
-    board.members.push({ user: user.id, name: user.name, role: 'normal' });
-
+    board.members.push({ user: user.id, name: user.name, email:user.email, role: 'normal' });
+   
     // Log activity
     board.activity.unshift({
       text: `${user.name} joined this board`,
     });
+    // console.log(board);
     await board.save();
 
     res.json(board.members);

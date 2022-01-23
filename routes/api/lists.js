@@ -31,7 +31,12 @@ router.post(
       board.lists.push(list.id);
 
       // Log activity
-      const user = await User.findOne({ 'email': `${req.params.email}` });
+      const user = await User.findOne({ 'email': `${req.user.email}` });
+      console.log(user, req.params);
+      if(!user){
+        res.send('error in user fetch');
+        return;
+      }
       board.activity.unshift({
         text: `${user.name} added '${title}' to this board`,
       });
@@ -39,7 +44,7 @@ router.post(
 
       res.json(list);
     } catch (err) {
-      console.error(err.message);
+      console.error(err.message,err);
       res.status(500).send('Server Error');
     }
   }
@@ -119,7 +124,7 @@ router.patch('/archive/:archive/:id', [ member], async (req, res) => {
     await list.save();
 
     // Log activity
-    const user = await User.findOne({ 'email': `${req.params.email}` });
+    const user = await User.findOne({ 'email': `${req.user.email}` });
     const board = await Board.findById(req.header('boardId'));
     board.activity.unshift({
       text: list.archived
