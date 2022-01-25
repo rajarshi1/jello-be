@@ -57,7 +57,7 @@ router.get('/', async (req, res) => {
   // console.log(req.user.email, user1 );
   try {
     const user = await User.findOne({ 'email': `${req.user.email}` });
-    console.log(user);
+    // console.log(user);
     const boards = [];
     for (const boardId of user.boards) {
       // boards.push(await Board.findById(boardId));
