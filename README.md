@@ -6,4 +6,4 @@ Clone the repository
 
 Run - npm install
 
-Run - nodemon start
+Run - nodemon server.js
