@@ -66,3 +66,7 @@ app.get('/api/todos', (req, res) => {
 app.listen(PORT, () => {
   console.log(`Server on http://localhost:${PORT}`)
 })
+
+module.exports = {
+  app
+}

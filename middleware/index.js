@@ -4,7 +4,7 @@ class Middleware {
 	async decodeToken(req, res, next) {
         const token = req.headers.authorization
 		// console.log(req._parsedUrl.path);
-		if(req._parsedUrl.path=='/api/auth/signup'){
+		if(req._parsedUrl.path=='/api/auth/signup' || req._parsedUrl.path=='/'){
 			return next();
 		}
 		try {

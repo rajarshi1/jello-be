@@ -6,7 +6,6 @@
   "scripts": {
     "start": "node server.js",
     "server": "nodemon server.js"
-
   },
   "engines": {
     "npm": "8.x",
@@ -27,5 +26,10 @@
     "mongodb": "^4.2.2",
     "mongoose": "^6.1.5",
     "nodemon": "^2.0.15"
+  },
+  "devDependencies": {
+    "expect": "^27.4.6",
+    "mocha": "^9.2.0",
+    "supertest": "^6.2.2"
   }
 }
