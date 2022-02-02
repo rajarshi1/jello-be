@@ -11,6 +11,9 @@ const CardSchema = new Schema({
   label: {
     type: String,
   },
+  dueDate: {
+    type: String,
+  },
   members: [
     {
       _id: false,

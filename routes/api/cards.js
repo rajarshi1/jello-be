@@ -86,7 +86,7 @@ router.get('/:id', async (req, res) => {
 // Edit a card's title, description, and/or label
 router.patch('/edit/:id', member, async (req, res) => {
   try {
-    const { title, description, label } = req.body;
+    const { title, description, label, dueDate } = req.body;
     if (title === '') {
       return res.status(400).json({ msg: 'Title is required' });
     }
@@ -103,8 +103,11 @@ router.patch('/edit/:id', member, async (req, res) => {
     if (label || label === 'none') {
       card.label = label;
     }
+    if (dueDate || dueDate === 'none') {
+      card.dueDate = dueDate;
+    }
+    
     await card.save();
-
     res.json(card);
   } catch (err) {
     console.error(err.message);
@@ -193,18 +196,18 @@ router.put('/addMember/:add/:cardId/:userId', member, async (req, res) => {
   try {
     const { cardId, userId } = req.params;
     const card = await Card.findById(cardId);
-    const user = await User.findOne({ 'email': `${req.user.email}` });
+    const user = await User.findOne({ 'email': `${userId}` });
     if (!card || !user) {
       return res.status(404).json({ msg: 'Card/user not found' });
     }
 
     const add = req.params.add === 'true';
     const members = card.members.map((member) => member.user);
-    const index = members.indexOf(userId);
-    if ((add && members.includes(userId)) || (!add && index === -1)) {
+    const index = members.indexOf(user._id);
+    if ((add && members.includes(user._id)) || (!add && index === -1)) {
       return res.json(card);
     }
-
+    // console.log(add,user,index);
     if (add) {
       card.members.push({ user: user.id, name: user.name });
     } else {

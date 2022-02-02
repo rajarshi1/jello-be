@@ -15,7 +15,7 @@ class Middleware {
 			}
 			return res.json({ message: 'Un authorize' });
 		} catch (e) {
-            console.log(e);
+            // console.log(e);
             return response.responseHelper(res, false, 'bad token');
 		}
 	}

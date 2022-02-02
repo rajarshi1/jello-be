@@ -112,7 +112,7 @@ router.patch(
   '/rename/:id',
   [member, [check('title', 'Title is required').not().isEmpty()]],
   async (req, res) => {
-    console.log(req.params);
+    
     const errors = validationResult(req);
     if (!errors.isEmpty()) {
       return res.status(400).json({ errors: errors.array() });
@@ -149,7 +149,11 @@ router.put('/addMember/:email', member, async (req, res) => {
     
     const board = await Board.findById(req.header('boardId'));
     const user = await User.findOne({ 'email': `${req.params.email}` });
-   
+    
+    if(!board){
+      return res.status(404).json({ msg: 'board not found' });
+    }
+
     if (!user) {
       return res.status(404).json({ msg: 'User not found' });
     }
