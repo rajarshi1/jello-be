@@ -200,18 +200,22 @@ router.put('/addMember/:add/:cardId/:userId', member, async (req, res) => {
     if (!card || !user) {
       return res.status(404).json({ msg: 'Card/user not found' });
     }
-
+    
     const add = req.params.add === 'true';
-    const members = card.members.map((member) => member.user);
+    // console.log(add, req.params.add);
+    const members = card.members.map((member) => member.user.toHexString());
     const index = members.indexOf(user._id);
-    if ((add && members.includes(user._id)) || (!add && index === -1)) {
+    
+    if ((add && members.includes(user._id.toHexString()))) {
       return res.json(card);
     }
     // console.log(add,user,index);
     if (add) {
+     
       card.members.push({ user: user.id, name: user.name });
     } else {
       card.members.splice(index, 1);
+      
     }
     await card.save();
 
